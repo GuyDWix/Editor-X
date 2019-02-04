@@ -4,8 +4,8 @@ var grid = false
 
 $(function () {
   init();
-  initSortable();
-  // muuriInit()
+  // initSortable();
+  muuriInit()
 
 });
 
@@ -175,6 +175,13 @@ function muuriInit() {
     dragSortInterval: 0,
     dragStartPredicate: {
       handle: '.board-column-header'
+    },
+    dragStartPredicate: function (item, e) {
+      if ($(e.target).hasClass("board-item-content")) {
+        return false;
+      }else{
+        return true
+      }
     },
     dragReleaseDuration: 400,
     dragReleaseEasing: 'ease'
