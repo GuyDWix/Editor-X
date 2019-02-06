@@ -10,6 +10,7 @@ function init() {
   initOutlayoutStyling()
   initUIClicks()
   initSortable()
+  createSpacers()
   initResizable()
   // updateLayoutsSizes()
 }
@@ -38,7 +39,7 @@ function updateLayoutsSizes() {
   basisCalc = Math.round(100 / layoutsNum) + "%"
 
   $('.section_layout').each(function () {
-    $(this).css('flex-basis',basisCalc)
+    $(this).css('flex-basis', basisCalc)
   })
 }
 
@@ -199,7 +200,7 @@ function createRisizes() {
 `
   elements.each(function () {
     let resizeElChild = $(this).children()
-    if (resizeElChild.length >= 1) {
+    if (resizeElChild.length >= 1 && !resizeElChild.hasClass('spacers_wrapper')) {
       resizeElChild.append(resizeTemplate)
     } else {
       $(this).append(resizeTemplate)
@@ -207,41 +208,46 @@ function createRisizes() {
   })
 }
 
-function createSpacers(){
+function createSpacers() {
   const elements = $('.section_item')
-  const spacerTemplate = `
-  <div class="spacers_wrapper">
-    <div class='spacers'>
-      <div class='spacer resizable top'>
-        <div class="spacer-handle resizer top"></div>
-      </div>
-      <div class='spacer resizable right'>
-        <div class="spacer-handle resizer right"></div>
-      </div>
-      <div class='spacer resizable bottom'>
-        <div class="spacer-handle resizer bottom"></div>
-      </div>
-      <div class='spacer resizable left'>
-        <div class="spacer-handle resizer left"></div>
-      </div>
-    </div>
-  </div>
-`
+
   elements.each(function () {
-    let spacerElChild = $(this).children()
-    if (spacerElChild.length >= 1 && !spacerElChild.hasClass('resizes_wrapper')) {
-      spacerElChild.append(spacerTemplate)
-    } else {
-      $(this).prepend(spacerTemplate)
-    }
+    const spacerTemplate = `
+    <div class="spacers_wrapper">
+        <div class='spacer resizable top'>
+          <div class="spacer-handle resizer top"></div>
+        </div>
+        <div class='spacer resizable right'>
+          <div class="spacer-handle resizer right"></div>
+        </div>
+        <div class='spacer resizable bottom'>
+          <div class="spacer-handle resizer bottom"></div>
+        </div>
+        <div class='spacer resizable left'>
+          <div class="spacer-handle resizer left"></div>
+        </div>
+      ${$(this)[0].outerHTML}
+    </div>
+  `
+    const elW = $(this).outerWidth()
+    const elH = $(this).outerHeight()
+    const $sectionParent = $(this).closest('.section_layout')
+
+    $sectionParent.append(spacerTemplate)
+    $(this).detach()
+
+    let spacersAddedWidth = $sectionParent.find('.spacer.top').height()
+
+    // $sectionParent.find('.spacers_wrapper')
+    //   .width(elW + spacersAddedWidth * 2)
+    //   .height(elH + spacersAddedWidth * 2)
   })
 }
 
 function initResizable() {
   createRisizes()
 
-  const element = document.querySelector('.resizable');
-  const resizers = element.querySelectorAll('.resizer')
+  const resizers = document.querySelectorAll('.resizer')
   const minimum_size = 20;
   let original_width = 0;
   let original_height = 0;
@@ -252,6 +258,8 @@ function initResizable() {
 
   for (let i = 0; i < resizers.length; i++) {
     const currentResizer = resizers[i];
+    const element = currentResizer.closest('.resizable');
+
     currentResizer.addEventListener('mousedown', function (e) {
       e.preventDefault()
       e.stopPropagation()

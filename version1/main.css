@@ -2,6 +2,8 @@
   --blue--main: #459FED;
 }
 
+* {box-sizing: border-box;}
+
 body {
   margin: 0;
   padding: 0;
@@ -93,7 +95,7 @@ img {
 
 .section_canvas {
   position: relative;
-  min-height: 420px;
+  min-height: 372px;
   width: 960px;
   background: white;
   box-shadow: 1px 2px 15px rgba(0, 0, 0, 0.2);
@@ -104,14 +106,14 @@ img {
 } */
 
 .section_layout {
+  height:fit-content;
   outline-offset: -1px;
   width: auto;
-  padding: 40px;
   align-self: stretch;
 }
 
 .section_item {
-  position:relative;
+  position: relative;
   display: flex;
   flex-direction: column;
   width: fit-content;
@@ -172,7 +174,7 @@ img {
   outline: 2px solid #4eb7f5;
 }
 
-.show-outlines > .resizes_wrapper:hover .resizers{
+.show-outlines>.resizes_wrapper:hover .resizers {
   display: block;
 }
 
@@ -186,7 +188,7 @@ img {
   visibility: visible !important;
   outline: none;
   opacity: 0.3;
-  width:fit-content;
+  width: fit-content;
   height: fit-content;
 }
 
@@ -263,22 +265,22 @@ img {
 
 
 
-.resizes_wrapper{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
+.resizes_wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
-.resizable .resizers{
+.resizable .resizers {
   display: none;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
 }
 
-.resizable .resizers .resizer{
+.resizable .resizers .resizer {
   width: 8px;
   height: 8px;
   background: white;
@@ -289,144 +291,151 @@ img {
 .resizable .resizers .resizer.top {
   left: 50%;
   top: -6px;
-  cursor: ns-resize; 
+  cursor: ns-resize;
   transform: translateX(-50%)
 }
 
 .resizable .resizers .resizer.bottom {
   left: 50%;
   bottom: -6px;
-  cursor: ns-resize; 
+  cursor: ns-resize;
   transform: translateX(-50%)
 }
 
 .resizable .resizers .resizer.left {
   left: -6px;
   top: 50%;
-  cursor: ew-resize; 
+  cursor: ew-resize;
   transform: translateY(-50%)
 }
 
 .resizable .resizers .resizer.right {
   right: -6px;
   top: 50%;
-  cursor: ew-resize; 
+  cursor: ew-resize;
   transform: translateY(-50%)
 }
 
 .resizable .resizers .resizer.top-left {
   left: -6px;
   top: -6px;
-  cursor: nwse-resize; 
+  cursor: nwse-resize;
 }
+
 .resizable .resizers .resizer.top-right {
   right: -6px;
   top: -6px;
   cursor: nesw-resize;
 }
+
 .resizable .resizers .resizer.bottom-left {
   left: -6px;
   bottom: -6px;
   cursor: nesw-resize;
 }
+
 .resizable .resizers .resizer.bottom-right {
   right: -6px;
   bottom: -6px;
   cursor: nwse-resize;
 }
 
-.spacers_wrapper{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-
+.spacers_wrapper {
   --spacers-init-size: 26px;
-  --spacers-handle-size:4px;
+  --spacers-handle-size: 4px;
+    
+  display: grid;
+  grid-template-columns: [main-start] auto [content-start] auto [content-end] auto [main-end];
+  grid-template-rows: [main-start] auto [content-start] auto [content-end] auto [main-end];
 }
 
-.spacer{
-  position: absolute;
+.spacer {
+  position: relative;
   opacity: .3;
-  cursor: default; 
+  cursor: default;
+
 }
 
-.spacer:hover{
-  opacity:1;
+.spacer:hover {
+  opacity: 1;
   background: rgba(69, 159, 237, 0.15);
   outline-offset: -2px;
 }
 
 .spacer.top,
-.spacer.bottom{
-  left:50%;
-  transform: translateX(-50%);
-  width: calc(100% + 4px);
-  min-height:var(--spacers-init-size);
+.spacer.bottom {
+  width: 100%;
+  height: var(--spacers-init-size);
 }
 
-.spacer.top{
-  bottom: 100%;
+.spacer.top {
+  grid-column-start: main-start;
+	grid-column-end: main-end;
+  grid-row-start: main-start;
 }
 
-.spacer.bottom{
-  top: 100%;
+.spacer.bottom {
+  grid-column-start: main-start;
+  grid-column-end: main-end;
+  grid-row-start: content-end;
 }
 
 .spacer.left,
-.spacer.right{
-  top:50%;
-  transform: translateY(-50%);
-  height:calc(100% + 4px);
-  min-width: var(--spacers-init-size);
+.spacer.right {
+  height:100%;
+  width: var(--spacers-init-size);
 }
 
-.spacer.left{
-  right: 100%;
+.spacer.left {
+  grid-column-start: main-start;
+  grid-row-start: content-start;
+  grid-row-end: content-end;
 }
 
-.spacer.right{
-  left: 100%;
+.spacer.right {
+  grid-column-start: content-end;
+  grid-row-start: content-start;
+  grid-row-end: content-end;
 }
 
-.spacer-handle{
+
+.spacer-handle {
   position: absolute;
-  border-radius:100px;
+  border-radius: 100px;
   background: var(--blue--main);
 }
 
 .spacer.top .spacer-handle,
-.spacer.bottom .spacer-handle{
-  left:50%;
+.spacer.bottom .spacer-handle {
+  left: 50%;
   transform: translateX(-50%);
   width: 20%;
-  height:var(--spacers-handle-size);
-  cursor: ns-resize; 
+  height: var(--spacers-handle-size);
+  cursor: ns-resize;
 }
 
 .spacer.left .spacer-handle,
-.spacer.right .spacer-handle{
-  top:50%;
+.spacer.right .spacer-handle {
+  top: 50%;
   transform: translateY(-50%);
-  height:20%;
-  min-height: 40px;
+  height: 20%;
+  height: 40px;
   width: var(--spacers-handle-size);
-  cursor: ew-resize; 
+  cursor: ew-resize;
 }
 
-.spacer.top .spacer-handle{
-  bottom:100%;
+.spacer.top .spacer-handle {
+  top: 0;
 }
 
-.spacer.right .spacer-handle{
-  left:100%;
+.spacer.right .spacer-handle {
+  right: 0;
 }
 
-.spacer.bottom .spacer-handle{
-  top:100%;
+.spacer.bottom .spacer-handle {
+  bottom: 0;
 }
 
-.spacer.left .spacer-handle{
-  right:100%;
+.spacer.left .spacer-handle {
+  left:0;
 }
