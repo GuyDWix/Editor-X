@@ -1,56 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link
-      href="https://fonts.googleapis.com/css?family=Poppins"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="main.css" />    
-    <script src="./jquery.min.js"></script>
-    <script src="./jquery-ui.min.js"></script>
-    <script src="./jquery-ui-sortable-animation.js"></script>
-    <script src="./main.js"></script>
-    <title>X-Editor</title>
-  </head>
-  <body>
-    <div class="main_controls flex flex-row">
-        <button class="main_control toggle">smart layout</button>
-        <button class="main_control toggle_grid">gird is off</button>
-    </div>
-    <div class="container">
-      <div class="section_canvas show_grid sortable flex flex-row align-center">
-        <div class="section_layout draggable-outline flex flex-column justify-center">
-          <div class="section_item section_item_img draggable draggable-outline">
-            <img
-              style="display:block"
-              width="300"
-              src="./images/cactus.jpeg"
-              alt=""
-            />
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville">
+  <link rel="stylesheet" href="https://static.parastorage.com/services/third-party/fonts/Helvetica/fontFace.css">
+  <link rel="stylesheet" href="main.css" />
+  <script src="./jquery.min.js"></script>
+  <script src="./jquery-ui.min.js"></script>
+  <script src="https://unpkg.com/interactjs@1.3.4/dist/interact.min.js"></script>
+  <script src="./main.js"></script>
+  <title>X-Editor</title>
+</head>
+
+<body>
+  <div class="main_controls hide flex flex-row">
+    <button class="main_control toggle">smart layout</button>
+    <button class="main_control toggle_grid">gird is off</button>
+  </div>
+  <div class="container">
+    <div class="section_canvas show_grid sortable flex flex-row align-center">
+      <div class="align-bar flex flex-row collapsed collapsed-bottom">
+        <div class="align-bar-button selected" data-align="left"><img src="./images/align3.svg"></div>
+        <div class="align-bar-button" data-align="center"><img src="./images/align2.svg"></div>
+        <div class="align-bar-button" data-align="right"><img src="./images/align1.svg"></div>
+      </div>
+
+      <div class="recommended-layouts flex flex-column align-center justify-center collapsed collapsed-left">
+        <div class="recommended-layouts-heading"> Recommended Layouts </div>
+        <img class="layout-thumb" data-layout="1" src="./images/layout1.png">
+        <img class="layout-thumb" data-layout="2" src="./images/layout2.png">
+        <img class="layout-thumb" data-layout="3" src="./images/layout3.png">
+      </div>
+
+      <div class="section_layout sortable draggable-outline flex flex-column align-center justify-center">
+        <div class="section_item section_item_img draggable draggable-outline resizable">
+        </div>
+      </div>
+
+      <div class="section_layout sortable draggable-outline flex flex-column justify-center">
+        <div class="section_item draggable draggable-outline">
+          <div class="heading">Pop-up sale!</div>
+        </div>
+        <div class="section_item draggable draggable-outline">
+          <div class="text">
+            This is your About Section. It’s a great space to tell your story and to describe who you are and what you
+            do. If you're a business, talk about how you started and tell the story of your professional journey.
           </div>
         </div>
-
-        <div class="section_layout sortable draggable-outline flex flex-column justify-center">
-          <div class="section_item draggable draggable-outline">
-            <div class="heading">Getting started with Immiget</div>
-          </div>
-          <div class="section_item draggable draggable-outline">
-            <div class="text">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet
-              officiis sequi omnis fuga saepe! Deleniti inventore neque porro
-              voluptatem officiis.
-            </div>
-          </div>
-          <div class="section_item draggable draggable-outline">
-            <div class="button">
-              MORE INFO
-            </div>
+        <div class="section_item draggable draggable-outline">
+          <div class="button">
+            SHOP NOW
           </div>
         </div>
       </div>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>
