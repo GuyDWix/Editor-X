@@ -12,8 +12,7 @@ function init() {
   initSortable()
   initResizable()
   initOutlayoutStyling()
-
-  // updateLayoutsSizes()
+ UITouchUp()
 }
 
 function initUIClicks() {
@@ -33,16 +32,6 @@ function initUIClicks() {
   })
 }
 
-
-function updateLayoutsSizes() {
-
-  layoutsNum = $('.section_layout').length
-  basisCalc = Math.round(100 / layoutsNum) + "%"
-
-  $('.section_layout').each(function () {
-    $(this).css('flex-basis', basisCalc)
-  })
-}
 
 function initOutlayoutStyling() {
   $(".draggable-outline")
@@ -353,7 +342,6 @@ function initResizable() {
         const height = original_height - (e.pageY - original_mouse_y)
         if (width > minimum_size) {
           element.style.width = width + 'px'
-          element.style.left = original_x + (e.pageX - original_mouse_x) + 'px'
         }
         if (height > minimum_size) {
           element.style.height = height + 'px'
@@ -397,10 +385,20 @@ function initSpacers() {
       original_mouse_x = e.pageX;
       original_mouse_y = e.pageY;
 
-      window.addEventListener('mousemove', resize)
-      window.addEventListener('mouseup', stopResize)
+      window.addEventListener('mousemove', onSpaceResize)
+      window.addEventListener('mouseup', onSpaceResizeStop)
 
     })
+
+    function onSpaceResize(e){
+      $(currentSpacer).parent().addClass('show')
+      resize(e)
+    }
+    
+    function onSpaceResizeStop(e){
+      $(currentSpacer).parent().removeClass('show')
+      stopResize()
+    }
 
     function resize(e) {
       if (currentSpacer.classList.contains('top')) {
@@ -455,7 +453,7 @@ function initSpacers() {
 
     function stopResize() {
       restartDraggableOrSortable()
-      window.removeEventListener('mousemove', resize)
+      window.removeEventListener('mousemove', onSpaceResize)
     }
   }
 
@@ -514,4 +512,8 @@ function applyLayout(layoutNum) {
   $('.align-bar-button[data-align="center"]').click()
 
   restartDraggableOrSortable()
+}
+
+function UITouchUp(){
+  $('.section_item_img + .spacer.top').height(2)
 }

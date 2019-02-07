@@ -375,9 +375,15 @@ img {
   z-index: 10;
 }
 
-.spacer:hover {
+.spacer:hover,
+.spacer.show {
   opacity: 1;
   background: rgba(69, 159, 237, 0.15);
+}
+
+.section_layout > .spacer:hover,
+.section_layout > .spacer.show{
+  background: rgba(69, 237, 136, 0.15);
 }
 
 .spacer.top,
@@ -425,6 +431,10 @@ img {
   border-radius: 100px;
   background: var(--blue--main);
   z-index: 10;
+}
+
+.section_layout > .spacer .spacer-handle{
+  background: rgb(57, 186, 109);
 }
 
 .spacer-item  .spacer:hover .spacer-handle,
