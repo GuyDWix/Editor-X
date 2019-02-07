@@ -2,8 +2,6 @@
   --blue--main: #459FED;
 }
 
-* {box-sizing: border-box;}
-
 body {
   margin: 0;
   padding: 0;
@@ -106,9 +104,9 @@ img {
 } */
 
 .section_layout {
-  height:fit-content;
+  height: fit-content;
   outline-offset: -1px;
-  width: auto;
+  width: calc(auto + 200px);
   align-self: stretch;
 }
 
@@ -119,7 +117,7 @@ img {
   width: fit-content;
   height: fit-content;
   padding: 10px;
-  outline-offset: -5px;
+  outline-offset: -2px;
 }
 
 .section_item_img {
@@ -170,17 +168,19 @@ img {
   cursor: move;
 }
 
-.show-outlines {
+.show-outlines,
+.spacers_wrapper:hover .draggable-outline {
   outline: 2px solid #4eb7f5;
+  z-index: 1;
 }
 
-.show-outlines>.resizes_wrapper:hover .resizers {
+.resizes_wrapper:hover .resizers {
   display: block;
 }
 
 .grab-cursor {
   cursor: grab;
-  z-index: 9999999;
+  z-index: 1;
 }
 
 .ui-sortable-placeholder {
@@ -191,7 +191,6 @@ img {
   width: fit-content;
   height: fit-content;
 }
-
 
 .align-bar {
   position: absolute;
@@ -273,14 +272,14 @@ img {
   bottom: 0;
 }
 
-.resizable .resizers {
+.resizable-box .resizers {
   display: none;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
 }
 
-.resizable .resizers .resizer {
+.resizable-box .resizers .resizer {
   width: 8px;
   height: 8px;
   background: white;
@@ -288,53 +287,53 @@ img {
   position: absolute;
 }
 
-.resizable .resizers .resizer.top {
+.resizable-box .resizers .resizer.top {
   left: 50%;
   top: -6px;
   cursor: ns-resize;
   transform: translateX(-50%)
 }
 
-.resizable .resizers .resizer.bottom {
+.resizable-box .resizers .resizer.bottom {
   left: 50%;
   bottom: -6px;
   cursor: ns-resize;
   transform: translateX(-50%)
 }
 
-.resizable .resizers .resizer.left {
+.resizable-box .resizers .resizer.left {
   left: -6px;
   top: 50%;
   cursor: ew-resize;
   transform: translateY(-50%)
 }
 
-.resizable .resizers .resizer.right {
+.resizable-box .resizers .resizer.right {
   right: -6px;
   top: 50%;
   cursor: ew-resize;
   transform: translateY(-50%)
 }
 
-.resizable .resizers .resizer.top-left {
+.resizable-box .resizers .resizer.top-left {
   left: -6px;
   top: -6px;
   cursor: nwse-resize;
 }
 
-.resizable .resizers .resizer.top-right {
+.resizable-box .resizers .resizer.top-right {
   right: -6px;
   top: -6px;
   cursor: nesw-resize;
 }
 
-.resizable .resizers .resizer.bottom-left {
+.resizable-box .resizers .resizer.bottom-left {
   left: -6px;
   bottom: -6px;
   cursor: nesw-resize;
 }
 
-.resizable .resizers .resizer.bottom-right {
+.resizable-box .resizers .resizer.bottom-right {
   right: -6px;
   bottom: -6px;
   cursor: nwse-resize;
@@ -342,24 +341,30 @@ img {
 
 .spacers_wrapper {
   --spacers-init-size: 26px;
-  --spacers-handle-size: 4px;
-    
+  --spacers-handle-size: 5px;
+  width:fit-content;
   display: grid;
   grid-template-columns: [main-start] auto [content-start] auto [content-end] auto [main-end];
   grid-template-rows: [main-start] auto [content-start] auto [content-end] auto [main-end];
 }
 
+.spacers_wrapper .section_item{
+  grid-column-start: content-start;
+  grid-column-end: content-end;
+  grid-row-start: content-start;
+  grid-row-end: content-end;
+}
+
 .spacer {
   position: relative;
-  opacity: .3;
+  opacity: .5;
   cursor: default;
-
+  z-index: 10;
 }
 
 .spacer:hover {
   opacity: 1;
   background: rgba(69, 159, 237, 0.15);
-  outline-offset: -2px;
 }
 
 .spacer.top,
@@ -370,7 +375,7 @@ img {
 
 .spacer.top {
   grid-column-start: main-start;
-	grid-column-end: main-end;
+  grid-column-end: main-end;
   grid-row-start: main-start;
 }
 
@@ -382,7 +387,7 @@ img {
 
 .spacer.left,
 .spacer.right {
-  height:100%;
+  height: 100%;
   width: var(--spacers-init-size);
 }
 
@@ -400,9 +405,15 @@ img {
 
 
 .spacer-handle {
+  display: none;
   position: absolute;
   border-radius: 100px;
   background: var(--blue--main);
+  z-index: 10;
+}
+
+.spacers_wrapper:hover .spacer-handle{
+  display: block;
 }
 
 .spacer.top .spacer-handle,
@@ -425,17 +436,17 @@ img {
 }
 
 .spacer.top .spacer-handle {
-  top: 0;
+  top: 100% ;
 }
 
 .spacer.right .spacer-handle {
-  right: 0;
+  left: 100%;
 }
 
 .spacer.bottom .spacer-handle {
-  bottom: 0;
+  top: 100%;
 }
 
 .spacer.left .spacer-handle {
-  left:0;
+  left: 100%;
 }

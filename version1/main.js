@@ -7,11 +7,12 @@ $(function () {
 });
 
 function init() {
-  initOutlayoutStyling()
+  initSpacers()
   initUIClicks()
   initSortable()
-  createSpacers()
   initResizable()
+  initOutlayoutStyling()
+
   // updateLayoutsSizes()
 }
 
@@ -49,8 +50,9 @@ function initOutlayoutStyling() {
       $(this)
         .addClass("move-cursor")
 
-      if ($(this).hasClass('draggable-outline'))
+      if ($(this).hasClass('draggable-outline')) {
         $(this).addClass("show-outlines")
+      }
     })
 
     .on("mouseout", function () {
@@ -158,6 +160,7 @@ function initSortable() {
       },
       out: function (event, ui) {
         $(ui.sender).width($(ui.sender).width())
+        $('.section_layout').removeClass('show-outlines')
       },
       stop: function () {
         $('.resizer').removeClass('hide')
@@ -165,6 +168,14 @@ function initSortable() {
       activate: function (event, ui) {
         $(ui.item).css('z-index', '999999999999')
         $('.resizer').addClass('hide')
+      },
+      over: function (event, ui) {
+        let $targetSection = $(event.target)
+        let $originalSection = $(ui.sender)
+
+        if ($targetSection != $originalSection) {
+          $targetSection.addClass('show-outlines')
+        }
       }
     })
     .addClass('draggable-outline')
@@ -182,7 +193,7 @@ function initDraggable() {
 }
 
 function createRisizes() {
-  const elements = $('.resizable')
+  const elements = $('.resizable-box')
   const resizeTemplate = `
   <div class="resizes_wrapper">
     <div class='resizers'>
@@ -199,54 +210,45 @@ function createRisizes() {
   </div>
 `
   elements.each(function () {
-    let resizeElChild = $(this).children()
-    if (resizeElChild.length >= 1 && !resizeElChild.hasClass('spacers_wrapper')) {
-      resizeElChild.append(resizeTemplate)
-    } else {
       $(this).append(resizeTemplate)
-    }
   })
 }
 
 function createSpacers() {
-  const elements = $('.section_item')
+  const elements = $('.spacer-item')
+  let spacerTemplate = ``
 
   elements.each(function () {
-    const spacerTemplate = `
-    <div class="spacers_wrapper">
-        <div class='spacer resizable top'>
-          <div class="spacer-handle resizer top"></div>
-        </div>
-        <div class='spacer resizable right'>
-          <div class="spacer-handle resizer right"></div>
-        </div>
-        <div class='spacer resizable bottom'>
-          <div class="spacer-handle resizer bottom"></div>
-        </div>
-        <div class='spacer resizable left'>
-          <div class="spacer-handle resizer left"></div>
-        </div>
-      ${$(this)[0].outerHTML}
-    </div>
-  `
-    const elW = $(this).outerWidth()
-    const elH = $(this).outerHeight()
-    const $sectionParent = $(this).closest('.section_layout')
+    if ($(this).hasClass('spacer-invert')) {
+      spacerTemplate = `
+            <div class="spacers_wrapper">
+            ${$(this)[0].outerHTML}
+                <div class='spacer top'>
+                  <div class="spacer-handle top"></div>
+                </div>
+            </div>
+          `
 
-    $sectionParent.append(spacerTemplate)
-    $(this).detach()
+      $sectionParent = $(this).closest('.section_layout')
 
-    let spacersAddedWidth = $sectionParent.find('.spacer.top').height()
+      $sectionParent.append(spacerTemplate)
+      $(this).detach()
+    } else if ($(this).hasClass('spacer-inner')) {
+      const spacerTemplate = `
+            <div class="inner_spacers_wrapper">
+                <div class='inner-spacer top'>
+                  <div class="spacer-handle top"></div>
+                </div>
+            </div>
+          `
 
-    // $sectionParent.find('.spacers_wrapper')
-    //   .width(elW + spacersAddedWidth * 2)
-    //   .height(elH + spacersAddedWidth * 2)
+      $(this).append(spacerTemplate)
+    }
   })
 }
 
 function initResizable() {
   createRisizes()
-
   const resizers = document.querySelectorAll('.resizer')
   const minimum_size = 20;
   let original_width = 0;
@@ -258,7 +260,7 @@ function initResizable() {
 
   for (let i = 0; i < resizers.length; i++) {
     const currentResizer = resizers[i];
-    const element = currentResizer.closest('.resizable');
+    const element = currentResizer.closest('.resizable-box');
 
     currentResizer.addEventListener('mousedown', function (e) {
       e.preventDefault()
@@ -281,25 +283,43 @@ function initResizable() {
     function resize(e) {
 
       if (currentResizer.classList.contains('top')) {
-        const height = original_height - (e.pageY - original_mouse_y)
-        if (height > minimum_size) {
-          element.style.height = height + 'px'
+        let height = original_height - (e.pageY - original_mouse_y)
+
+        if (currentResizer.classList.contains('spacer-handle')) {
+          height = original_height + (e.pageY - original_mouse_y)
+        } else {
+          if (height < minimum_size) {
+            return false
+          }
         }
+
+        element.style.height = height + 'px'
+
       } else if (currentResizer.classList.contains('bottom')) {
-        const height = original_height + (e.pageY - original_mouse_y)
+        let height = original_height + (e.pageY - original_mouse_y)
+
         if (height > minimum_size) {
           element.style.height = height + 'px'
         }
       } else if (currentResizer.classList.contains('right')) {
-        const width = original_width + (e.pageX - original_mouse_x)
+        let width = original_width + (e.pageX - original_mouse_x)
+
         if (width > minimum_size) {
           element.style.width = width + 'px'
         }
       } else if (currentResizer.classList.contains('left')) {
-        const width = original_width - (e.pageX - original_mouse_x)
-        if (width > minimum_size) {
-          element.style.width = width + 'px'
+        let width = original_width - (e.pageX - original_mouse_x)
+
+        if (currentResizer.classList.contains('spacer-handle')) {
+          width = original_width + (e.pageX - original_mouse_x)
+        } else {
+          if (width < minimum_size) {
+            return false
+          }
         }
+
+        element.style.width = width + 'px'
+
       } else if (currentResizer.classList.contains('bottom-right')) {
         const width = original_width + (e.pageX - original_mouse_x)
         const height = original_height + (e.pageY - original_mouse_y)
@@ -327,7 +347,7 @@ function initResizable() {
         if (height > minimum_size) {
           element.style.height = height + 'px'
         }
-      } else {
+      } else if (currentResizer.classList.contains('top-left')) {
         const width = original_width - (e.pageX - original_mouse_x)
         const height = original_height - (e.pageY - original_mouse_y)
         if (width > minimum_size) {
@@ -338,6 +358,88 @@ function initResizable() {
           element.style.height = height + 'px'
         }
       }
+    }
+
+    function stopResize() {
+      restartDraggableOrSortable()
+      window.removeEventListener('mousemove', resize)
+    }
+  }
+
+}
+
+function initSpacers() {
+  createSpacers()
+  const spacers = document.querySelectorAll('.spacer-handle')
+  const minimum_size = 0;
+  let original_width = 0;
+  let original_height = 0;
+  let original_x = 0;
+  let original_y = 0;
+  let original_mouse_x = 0;
+  let original_mouse_y = 0;
+
+  for (let i = 0; i < spacers.length; i++) {
+    const currentSpacer= spacers[i];
+    const element = currentSpacer.closest('.spacer');
+
+    currentSpacer.addEventListener('mousedown', function (e) {
+      e.preventDefault()
+      e.stopPropagation()
+
+      destroyDraggableOrSortable()
+
+      original_width = parseFloat(getComputedStyle(element, null).getPropertyValue('width').replace('px', ''));
+      original_height = parseFloat(getComputedStyle(element, null).getPropertyValue('height').replace('px', ''));
+      original_x = element.getBoundingClientRect().left;
+      original_y = element.getBoundingClientRect().top;
+      original_mouse_x = e.pageX;
+      original_mouse_y = e.pageY;
+
+      window.addEventListener('mousemove', resize)
+      window.addEventListener('mouseup', stopResize)
+
+    })
+
+    function resize(e) {
+      if (currentSpacer.classList.contains('top')) {
+        let height = original_height - (e.pageY - original_mouse_y)
+
+        if ($(currentSpacer).parents('.spacers_wrapper').find('.spacer-invert').length > 0) {
+          height = original_height + (e.pageY - original_mouse_y)
+        }
+        if (height > minimum_size) {
+          height -=2
+          element.style.height = height + 'px'
+        }
+
+      } else if (currentSpacer.classList.contains('bottom')) {
+        let height = original_height + (e.pageY - original_mouse_y)
+
+        if (height > minimum_size) {
+          element.style.height = height + 'px'
+        }
+      } else if (currentSpacer.classList.contains('right')) {
+        let width = original_width + (e.pageX - original_mouse_x)
+
+        if (width > minimum_size) {
+          element.style.width = width + 'px'
+        }
+      } else if (currentSpacer.classList.contains('left')) {
+        let width = original_width - (e.pageX - original_mouse_x)
+
+        if ($(currentSpacer).parents('.spacers_wrapper').find('.spacer-invert').length > 0) {
+          width -=2
+          width = original_width + (e.pageX - original_mouse_x)
+        }
+
+        if (width > minimum_size) {
+          element.style.width = width + 'px'
+        }
+      } 
+
+      $(currentSpacer).css('opacity','1')
+
     }
 
     function stopResize() {
