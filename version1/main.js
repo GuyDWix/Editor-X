@@ -93,7 +93,7 @@ function alignBtns() {
       break;
   }
 
-  $('.section_layout').css({
+  $('.section_layout_flex_wrapper').css({
     alignItems: alignFlexMode,
     textAlign: alignMode
   })
@@ -143,8 +143,9 @@ function initSortable() {
   $(".section_layout").sortable({
       tolerance: "pointer",
       connectWith: ".section_layout",
+      items: '.section_item_wrapper',
       receive: function (event, ui) {
-        if ($(ui.sender).children().length <= 0) {
+        if ($(ui.sender).find('.section_item').length == 0) {
           $(".section_canvas").width($(".section_canvas").width())
           $(ui.sender).remove()
           $('.section_layout').width('100%')
@@ -210,7 +211,7 @@ function createRisizes() {
   </div>
 `
   elements.each(function () {
-      $(this).append(resizeTemplate)
+    $(this).append(resizeTemplate)
   })
 }
 
@@ -221,7 +222,7 @@ function createSpacers() {
   elements.each(function () {
     if ($(this).hasClass('spacer-invert')) {
       spacerTemplate = `
-            <div class="spacers_wrapper">
+            <div class="spacers_wrapper section_item_wrapper">
             ${$(this)[0].outerHTML}
                 <div class='spacer top'>
                   <div class="spacer-handle top"></div>
@@ -229,7 +230,7 @@ function createSpacers() {
             </div>
           `
 
-      $sectionParent = $(this).closest('.section_layout')
+      $sectionParent = $(this).parent()
 
       $sectionParent.append(spacerTemplate)
       $(this).detach()
@@ -380,7 +381,7 @@ function initSpacers() {
   let original_mouse_y = 0;
 
   for (let i = 0; i < spacers.length; i++) {
-    const currentSpacer= spacers[i];
+    const currentSpacer = spacers[i];
     const element = currentSpacer.closest('.spacer');
 
     currentSpacer.addEventListener('mousedown', function (e) {
@@ -405,22 +406,32 @@ function initSpacers() {
       if (currentSpacer.classList.contains('top')) {
         let height = original_height - (e.pageY - original_mouse_y)
 
-        if ($(currentSpacer).parents('.spacers_wrapper').find('.spacer-invert').length > 0) {
+        if ($(currentSpacer).parent().parent().find('.spacer-invert').length > 0) {
           height = original_height + (e.pageY - original_mouse_y)
         }
+
         if (height > minimum_size) {
-          height -=2
+          height -= 2
           element.style.height = height + 'px'
         }
 
       } else if (currentSpacer.classList.contains('bottom')) {
         let height = original_height + (e.pageY - original_mouse_y)
 
+        if ($(currentSpacer).parent().parent().find('.spacer-invert').length > 0) {
+          height = original_height - (e.pageY - original_mouse_y)
+        }
         if (height > minimum_size) {
           element.style.height = height + 'px'
         }
+
+
       } else if (currentSpacer.classList.contains('right')) {
         let width = original_width + (e.pageX - original_mouse_x)
+
+        if ($(currentSpacer).parent().parent().find('.spacer-invert').length > 0) {
+          width = original_width - (e.pageX - original_mouse_x)
+        }
 
         if (width > minimum_size) {
           element.style.width = width + 'px'
@@ -428,17 +439,17 @@ function initSpacers() {
       } else if (currentSpacer.classList.contains('left')) {
         let width = original_width - (e.pageX - original_mouse_x)
 
-        if ($(currentSpacer).parents('.spacers_wrapper').find('.spacer-invert').length > 0) {
-          width -=2
+        if ($(currentSpacer).parent().parent().find('.spacer-invert').length > 0) {
+          width -= 2
           width = original_width + (e.pageX - original_mouse_x)
-        }
+        } 
 
         if (width > minimum_size) {
           element.style.width = width + 'px'
         }
-      } 
+      }
 
-      $(currentSpacer).css('opacity','1')
+      $(currentSpacer).css('opacity', '1')
 
     }
 

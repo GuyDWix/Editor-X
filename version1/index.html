@@ -21,7 +21,7 @@
     <button class="main_control toggle_grid">gird is off</button>
   </div>
   <div class="container">
-    <div class="section_canvas show_grid sortable flex flex-row align-center">
+    <div class="section_canvas show_grid sortable flex flex-row">
       <div class="align-bar flex flex-row collapsed collapsed-bottom">
         <div class="align-bar-button selected" data-align="left"><img src="./images/align3.svg"></div>
         <div class="align-bar-button" data-align="center"><img src="./images/align2.svg"></div>
@@ -35,26 +35,54 @@
         <img class="layout-thumb" data-layout="3" src="./images/layout3.png">
       </div>
 
-      <div class="section_layout sortable draggable-outline spacer-item flex flex-column" style="min-height:420px">
-        <div class="section_item section_item_img draggable draggable-outline resizable-box spacer-item spacer-invert">
+      <div class="section_layout sortable draggable-outline spacer-item">
+        <div class="section_layout_flex_wrapper flex flex-column ">
+          <div class="section_item section_item_img draggable draggable-outline resizable-box spacer-item spacer-invert">
+          </div>
         </div>
-
+        <div class='spacer top'>
+            <div class="spacer-handle top"></div>
+          </div>
+          <div class='spacer bottom'>
+            <div class="spacer-handle bottom"></div>
+          </div>
+          <div class='spacer left'>
+            <div class="spacer-handle left"></div>
+          </div>
+          <div class='spacer right'>
+            <div class="spacer-handle right"></div>
+          </div>
       </div>
 
-      <div class="section_layout sortable draggable-outline spacer-item flex flex-column " style="min-height:420px">
-        <div class="section_item draggable draggable-outline spacer-item spacer-invert resizable-box">
-          <div class="heading ">Pop-up sale!</div>
-        </div>
-        <div class="section_item draggable draggable-outline spacer-item spacer-invert resizable-box">
-          <div class="text">
-            This is your About Section. It’s a great space to tell your story and to describe who you are and what you
-            do. If you're a business, talk about how you started and tell the story of your professional journey.
+      <div class="section_layout sortable draggable-outline spacer-item">
+        <div class="section_layout_flex_wrapper flex flex-column">
+          <div class="section_item draggable draggable-outline spacer-item spacer-invert resizable-box" style="width:304px;">
+            <div class="heading ">Pop-up sale!</div>
+          </div>
+          <div class="section_item draggable draggable-outline spacer-item spacer-invert resizable-box">
+            <div class="text">
+              This is your About Section. It’s a great space to tell your story and to describe who you are and what
+              you
+              do. If you're a business, talk about how you started and tell the story of your professional journey.
+            </div>
+          </div>
+          <div class="section_item draggable draggable-outline spacer-item spacer-invert resizable-box">
+            <div class="button">
+              SHOP NOW
+            </div>
           </div>
         </div>
-        <div class="section_item draggable draggable-outline spacer-item spacer-invert resizable-box">
-          <div class="button">
-            SHOP NOW
-          </div>
+        <div class='spacer top'>
+          <div class="spacer-handle top"></div>
+        </div>
+        <div class='spacer bottom'>
+          <div class="spacer-handle bottom"></div>
+        </div>
+        <div class='spacer left'>
+          <div class="spacer-handle left"></div>
+        </div>
+        <div class='spacer right'>
+          <div class="spacer-handle right"></div>
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 :root {
   --blue--main: #459FED;
+  --spacers-init-size: 26px;
+  --spacers-handle-size: 5px;
 }
 
 body {
@@ -58,11 +60,13 @@ img {
 
 .container {
   width: 100vw;
-  height: 100vh;
+  min-height:80vh;
+  height: auto;
   background: #f9f9f9;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding:10vh 0;
 }
 
 .main_controls {
@@ -104,8 +108,8 @@ img {
 } */
 
 .section_layout {
-  height: fit-content;
-  outline-offset: -1px;
+  /* height: fit-content; */
+  outline-offset: 0;
   width: calc(auto + 200px);
   align-self: stretch;
 }
@@ -120,6 +124,11 @@ img {
   outline-offset: -2px;
 }
 
+.section_item > *{
+  width:100%;
+  height:100%;
+}
+
 .section_item_img {
   flex-shrink: 1;
   width: 300px;
@@ -127,7 +136,7 @@ img {
   background: url(./images/main_img.png) no-repeat;
   background-size: cover;
   background-position: center;
-  outline-offset: 0;
+  outline-offset: -2px;
 }
 
 .heading {
@@ -138,14 +147,11 @@ img {
 
 .text {
   font-size: 11px;
-  width: 440px;
   line-height: 26px;
 }
 
 .button {
   background: white;
-  width: fit-content;
-  height: fit-content;
   padding: 12px 15px;
   color: black;
   font-size: 8px;
@@ -153,6 +159,8 @@ img {
   letter-spacing: 8px;
   border: 1px solid black;
   text-align: center;
+  width:calc(100% - 30px);
+  height:calc(100% - 24px);
 }
 
 .grid_item {
@@ -340,12 +348,17 @@ img {
 }
 
 .spacers_wrapper {
-  --spacers-init-size: 26px;
-  --spacers-handle-size: 5px;
   width:fit-content;
   display: grid;
-  grid-template-columns: [main-start] auto [content-start] auto [content-end] auto [main-end];
-  grid-template-rows: [main-start] auto [content-start] auto [content-end] auto [main-end];
+  grid-template-columns: [main-start] minmax(auto,  max-content) [content-start] minmax(auto,  max-content)  [content-end] minmax(auto,  max-content) [main-end];
+  grid-template-rows: [main-start] minmax(auto,  max-content)  [content-start] 1fr  [content-end] minmax(auto,  max-content)  [main-end];
+}
+
+.section_layout{
+  width:fit-content;
+  display: grid;
+  grid-template-columns: [main-start] minmax(auto,  max-content) [content-start] minmax(auto,  max-content)  [content-end] minmax(auto,  max-content) [main-end];
+  grid-template-rows: [main-start] minmax(auto,  max-content)  [content-start] 1fr [content-end] minmax(auto,  max-content)  [main-end];
 }
 
 .spacers_wrapper .section_item{
@@ -370,13 +383,14 @@ img {
 .spacer.top,
 .spacer.bottom {
   width: 100%;
-  height: var(--spacers-init-size);
+  height:var(--spacers-init-size)
 }
 
 .spacer.top {
   grid-column-start: main-start;
   grid-column-end: main-end;
   grid-row-start: main-start;
+  grid-row-end: content-start;
 }
 
 .spacer.bottom {
@@ -388,11 +402,12 @@ img {
 .spacer.left,
 .spacer.right {
   height: 100%;
-  width: var(--spacers-init-size);
+  width:var(--spacers-init-size)
 }
 
 .spacer.left {
   grid-column-start: main-start;
+  grid-column-end: content-start;
   grid-row-start: content-start;
   grid-row-end: content-end;
 }
@@ -412,7 +427,8 @@ img {
   z-index: 10;
 }
 
-.spacers_wrapper:hover .spacer-handle{
+.spacer-item  .spacer:hover .spacer-handle,
+.spacer-item  .section_item:hover ~ .spacer .spacer-handle{
   display: block;
 }
 
@@ -436,17 +452,33 @@ img {
 }
 
 .spacer.top .spacer-handle {
-  top: 100% ;
+  bottom: 0 ;
 }
 
 .spacer.right .spacer-handle {
-  left: 100%;
+  left: 0;
 }
 
 .spacer.bottom .spacer-handle {
-  top: 100%;
+  top: 0;
 }
 
 .spacer.left .spacer-handle {
+  right: 0;
+}
+
+.spacer-invert ~ .spacer.top .spacer-handle {
+  top: 100% ;
+}
+
+.spacer-invert ~ .spacer.right .spacer-handle {
+  left: 100%;
+}
+
+.spacer-invert ~ .spacer.bottom .spacer-handle {
+  top: 100%;
+}
+
+.spacer-invert ~ .spacer.left .spacer-handle {
   left: 100%;
 }
