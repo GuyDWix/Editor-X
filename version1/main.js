@@ -1,6 +1,14 @@
 var mode = "sort"
 var grid = false
 var contrastTolarance = 120
+var currentSize = "1280"
+var isReloaded = false
+var sizeDom = {
+  1280:``,
+  960:``,
+  720:``,
+  480:``
+}
 
 $(function () {
   init()
@@ -31,7 +39,7 @@ function initUIClicks() {
     }, 300);
   })
 
-  $('.query_size_bar').click(updateCanvasSize)
+  $('.query_size_bar').click(updateCanvas)
 }
 
 
@@ -63,12 +71,20 @@ function initOutlayoutStyling() {
     });
 }
 
-function updateCanvasSize() {
-  let size = $(this).attr('data-size')
+function updateCanvas() {
+  let size = currentSize = $(this).attr('data-size')
+
+  if(sizeDom[currentSize].length > 0 && sizeDom[currentSize] !== ""){
+    reloadSavedDom()
+  }else{
+    reAdjustContent(size)
+    saveDomString()
+  }
+
   $('.section_canvas').animate({
     width: size
   }, 500)
-  reAdjustContent(size)
+
 }
 
 function reAdjustContent(size) {
@@ -83,14 +99,35 @@ function reAdjustContent(size) {
       .removeClass('flex-row')
       .addClass('flex-column')
 
-    $('.section_item_img')[0].style.minWidth = (size - colPaddingSum - 20) + 'px'
+
+    $('.section_item').each(function () {
+      $(this)[0].style.minWidth = (size - colPaddingSum - 20) + 'px'
+    })
+
+    $('.section_item .text, .section_item .heading').each(function () {
+      if ($(this)[0].style.width > size + colPaddingSum + 20)
+        $(this)[0].style.width = (size - colPaddingSum - 20) + 'px'
+    })
+
   } else {
     $('.section_canvas')
       .addClass('flex-row')
       .removeClass('flex-column')
 
-    $('.section_item_img')[0].style.minWidth = (size /colNum - colPaddingSum - 20) + 'px'
+      $('.section_item_img')[0].style.minWidth = (size/colNum - colPaddingSum - 20) + 'px'
   }
+}
+
+function saveDomString(){
+  sizeDom[currentSize] = document.body.innerHTML
+}
+
+function reloadSavedDom(){
+  document.body.innerHTML = sizeDom[currentSize]
+  setTimeout(() => {
+    isReloaded = true
+    init()
+  }, 200);
 }
 
 function alignBtns() {
@@ -362,7 +399,9 @@ function createSpacers() {
 }
 
 function initResizable() {
-  createRisizes()
+  if(!isReloaded){
+    createRisizes()
+  }
   const resizers = document.querySelectorAll('.resizer')
   const minimum_size = 20;
   let original_width = 0;
@@ -482,9 +521,13 @@ function initResizable() {
 
       const sectionCanvasWidth = $('.section_canvas').outerWidth()
       let totalW = 0
-      $('.section_column').each(function () {
-        totalW += $(this).outerWidth()
-      })
+      if ($('.section_canvas').hasClass('flex-row')) {
+        $('.section_column').each(function () {
+          totalW += $(this).outerWidth()
+        })
+      } else {
+        totalW = $('.section_column').first().outerWidth()
+      }
 
       if (totalW > sectionCanvasWidth) {
         let WMOD = totalW % sectionCanvasWidth
@@ -499,13 +542,16 @@ function initResizable() {
       $(currentResizer).closest('.section_item').removeClass('show-outlines')
       $(currentResizer).closest('.resizers').attr('style', '')
       window.removeEventListener('mousemove', resize)
+      saveDomString()
     }
   }
 
 }
 
 function initSpacers() {
-  createSpacers()
+  if(!isReloaded){
+    createSpacers()
+  }
   const spacers = document.querySelectorAll('.spacer-handle')
   const minimum_size = 0;
   let original_width = 0;
@@ -546,9 +592,13 @@ function initSpacers() {
     function resize(e) {
       const sectionCanvasWidth = $('.section_canvas').outerWidth()
       let totalW = 0
-      $('.section_column').each(function () {
-        totalW += $(this).outerWidth()
-      })
+      if ($('.section_canvas').hasClass('flex-row')) {
+        $('.section_column').each(function () {
+          totalW += $(this).outerWidth()
+        })
+      } else {
+        totalW = $('.section_column').first().outerWidth()
+      }
 
       let mouseDiffX = e.pageX - original_mouse_x
       let mouseDiffY = e.pageY - original_mouse_y
@@ -615,6 +665,7 @@ function initSpacers() {
     function stopResize() {
       restartDraggableOrSortable()
       window.removeEventListener('mousemove', onSpaceResize)
+      saveDomeString()
     }
   }
 
@@ -678,4 +729,6 @@ function applyLayout(layoutNum) {
 function UITouchUp() {
   $('.section_item_img + .spacer.top').height(2)
   $('.section_column').last().children('.spacer.top').first().height(95)
+  $('[data-size='+currentSize+']').siblings('input').attr('checked','true')
+  saveDomString()
 }

@@ -260,7 +260,8 @@ img {
   border: 1px solid black;
   text-align: center;
   width:calc(100% - 30px);
-  height:calc(100% - 24px);
+  min-height: inherit;
+  display:flex
 }
 
 .grid_item {
