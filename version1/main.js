@@ -30,6 +30,8 @@ function initUIClicks() {
       applyLayout($(this).attr('data-layout'))
     }, 300);
   })
+
+  $('.query_size_bar').click(updateCanvasSize)
 }
 
 
@@ -59,6 +61,36 @@ function initOutlayoutStyling() {
         .removeClass("grab-cursor")
         .addClass("move-cursor")
     });
+}
+
+function updateCanvasSize() {
+  let size = $(this).attr('data-size')
+  $('.section_canvas').animate({
+    width: size
+  }, 500)
+  reAdjustContent(size)
+}
+
+function reAdjustContent(size) {
+  size = parseInt(size)
+
+  let colPaddingSum = $('.section_item_img').closest('.section_layout_flex_wrapper').siblings('.spacer.left').width() + $('.section_item_img').closest('.section_layout_flex_wrapper').siblings('.spacer.right').width()
+
+  let colNum = $('.section_column').length
+
+  if (size < 960) {
+    $('.section_canvas')
+      .removeClass('flex-row')
+      .addClass('flex-column')
+
+    $('.section_item_img')[0].style.minWidth = (size - colPaddingSum - 20) + 'px'
+  } else {
+    $('.section_canvas')
+      .addClass('flex-row')
+      .removeClass('flex-column')
+
+    $('.section_item_img')[0].style.minWidth = (size /colNum - colPaddingSum - 20) + 'px'
+  }
 }
 
 function alignBtns() {
@@ -142,14 +174,16 @@ function initSortable() {
       items: '.section_item_wrapper',
       receive: function (event, ui) {
         if ($(ui.sender).find('.section_item').length == 0 && $(ui.sender).hasClass('section_column')) {
-            $(".section_canvas").width($(".section_canvas").width())
-            $(ui.sender).remove()
-            $('.section_column').width('100%')
-            $('.section_column').css('flex-basis', '100%')
+          $(".section_canvas")
+            .width($(".section_canvas").width())
+            .css('flex-direction', 'row')
+          $(ui.sender).remove()
+          $('.section_column').width('100%')
+          $('.section_column').css('flex-basis', '100%')
 
-            $('.collapsed').removeClass(function (index, className) {
-              return (className.match(/(^|\s)collapsed\S+/g) || []).join(' ')
-            });
+          $('.collapsed').removeClass(function (index, className) {
+            return (className.match(/(^|\s)collapsed\S+/g) || []).join(' ')
+          });
         } else if ($('.section_item_img').find('.section_item').length == 0) {
           $('.section_item_img').removeClass('overlay-white overlay-black')
         }
@@ -357,15 +391,10 @@ function initResizable() {
     })
 
     function resize(e) {
-      let sc = currentResizer.closest('.section_column')
+      let sc = currentResizer.closest('.section_canvas')
 
-
-      let columnPaddingL = $(sc).find('.spacer.left').width()
-      let columnPaddingR = $(sc).find('.spacer.right').width()
-
-      if(currentResizer.closest('section_item').hasClass('section_item_img')){
-
-      }
+      let columnPaddingL = $(sc).find('.section_column').first().find('.spacer.left').width()
+      let columnPaddingR = $(sc).find('.section_column').last().find('.spacer.right').width()
 
 
       let mouseDiffX = e.pageX - original_mouse_x
@@ -373,14 +402,14 @@ function initResizable() {
 
       let boundBox = sc.getBoundingClientRect()
       let leftColLimit = boundBox.left + boundBox.width - columnPaddingR
-      let rightColLimit = boundBox.left +  columnPaddingL
+      let rightColLimit = boundBox.left + columnPaddingL
 
- 
+
 
       if (currentResizer.classList.contains('top')) {
         let height = original_height - (mouseDiffY)
 
-        if (height > minimum_size ) {
+        if (height > minimum_size) {
           element.style.minHeight = height + 'px'
         }
 
@@ -395,14 +424,14 @@ function initResizable() {
 
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
-          element.querySelector('div').style.width = element.style.minWidth
+          element.children[0].style.width = element.style.minWidth
         }
       } else if (currentResizer.classList.contains('left')) {
         let width = original_width - (mouseDiffX)
 
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
-          element.querySelector('div').style.width = element.style.minWidth
+          element.children[0].style.width = element.style.minWidth
         }
 
       } else if (currentResizer.classList.contains('bottom-right')) {
@@ -410,7 +439,7 @@ function initResizable() {
         const height = original_height + (mouseDiffY)
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
-          element.querySelector('div').style.width = element.style.minWidth
+          element.children[0].style.width = element.style.minWidth
         }
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
@@ -423,14 +452,14 @@ function initResizable() {
         }
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
-          element.querySelector('div').style.width = element.style.minWidth
+          element.children[0].style.width = element.style.minWidth
         }
       } else if (currentResizer.classList.contains('top-right')) {
         const width = original_width + (mouseDiffX)
         const height = original_height - (mouseDiffY)
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
-          element.querySelector('div').style.width = element.style.minWidth
+          element.children[0].style.width = element.style.minWidth
         }
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
@@ -440,14 +469,14 @@ function initResizable() {
         const height = original_height - (mouseDiffY)
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
-          element.querySelector('div').style.width = element.style.minWidth
+          element.children[0].style.width = element.style.minWidth
         }
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
         }
 
       }
-      
+
       $(currentResizer).closest('.section_item').addClass('show-outlines')
       $(currentResizer).closest('.resizers').show()
 
@@ -468,7 +497,7 @@ function initResizable() {
     function stopResize() {
       restartDraggableOrSortable()
       $(currentResizer).closest('.section_item').removeClass('show-outlines')
-      $(currentResizer).closest('.resizers').attr('style','')
+      $(currentResizer).closest('.resizers').attr('style', '')
       window.removeEventListener('mousemove', resize)
     }
   }
@@ -629,8 +658,8 @@ function applyLayout(layoutNum) {
       .addClass('justify-between')
       .removeClass('justify-center')
 
-      $('.section_column').find('.spacer.top').height(1)
-      $('.section_column').find('.spacer.left, .spacer.right').width(1)
+    $('.section_column').find('.spacer.top').height(1)
+    $('.section_column').find('.spacer.left, .spacer.right').width(1)
 
     $sectionImg.css({
       width: 'calc(100% - 20px)',
@@ -648,4 +677,5 @@ function applyLayout(layoutNum) {
 
 function UITouchUp() {
   $('.section_item_img + .spacer.top').height(2)
+  $('.section_column').last().children('.spacer.top').first().height(95)
 }
