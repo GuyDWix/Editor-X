@@ -1,6 +1,6 @@
 var mode = "sort"
 var grid = false
-
+var contrastTolarance = 120
 
 $(function () {
   init()
@@ -12,7 +12,7 @@ function init() {
   initSortable()
   initResizable()
   initOutlayoutStyling()
- UITouchUp()
+  UITouchUp()
 }
 
 function initUIClicks() {
@@ -57,7 +57,6 @@ function initOutlayoutStyling() {
     .on("mouseup", function () {
       $(this)
         .removeClass("grab-cursor")
-        .removeClass("opac")
         .addClass("move-cursor")
     });
 }
@@ -129,27 +128,35 @@ function initSortable() {
     items: '.section_layout'
   });
 
+  $('.section_item_img').sortable({
+    tolerance: "pointer",
+    items: '.section_layout',
+    receive: function (event, ui) {
+      adjustTextContrast($(ui.item))
+    },
+  });
+
   $(".section_layout").sortable({
       tolerance: "pointer",
-      connectWith: ".section_layout",
+      connectWith: ".section_layout, .section_item_img",
       items: '.section_item_wrapper',
       receive: function (event, ui) {
-        if ($(ui.sender).find('.section_item').length == 0) {
-          $(".section_canvas").width($(".section_canvas").width())
-          $(ui.sender).remove()
-          $('.section_layout').width('100%')
+        if ($(ui.sender).find('.section_item').length == 0 && $(ui.sender).hasClass('section_column')) {
+            $(".section_canvas").width($(".section_canvas").width())
+            $(ui.sender).remove()
+            $('.section_column').width('100%')
+            $('.section_column').css('flex-basis', '100%')
 
-          $('.collapsed').removeClass(function (index, className) {
-            return (className.match(/(^|\s)collapsed\S+/g) || []).join(' ');
-          });
-
-        } else {
-          $('.section_layout').width('initial')
+            $('.collapsed').removeClass(function (index, className) {
+              return (className.match(/(^|\s)collapsed\S+/g) || []).join(' ')
+            });
+        } else if ($('.section_item_img').find('.section_item').length == 0) {
+          $('.section_item_img').removeClass('overlay-white overlay-black')
         }
         $(ui.item).css('z-index', 'initial')
       },
       out: function (event, ui) {
-        $(ui.sender).width($(ui.sender).width())
+        ui.sender.minWidth = ui.sender.minWidth
         $('.section_layout').removeClass('show-outlines')
       },
       stop: function () {
@@ -171,15 +178,98 @@ function initSortable() {
     .addClass('draggable-outline')
 }
 
+function adjustTextContrast(el) {
+  var parentImg = el.closest('.section_item_img')[0]
+  var rgb = getAverageRGB(parentImg)
+  var overlay = ""
+
+  var o = Math.round(((parseInt(rgb.r) * 299) +
+    (parseInt(rgb.b) * 587) +
+    (parseInt(rgb.g) * 114)) / 1000)
+  var fore = (o > contrastTolarance) ? 'black' : 'white'
+
+  if (o > contrastTolarance && contrastTolarance < 220) {
+    overlay = 'overlay-white'
+  } else if (o < contrastTolarance && contrastTolarance > 20) {
+    overlay = 'overlay-black'
+  }
+
+  el.css('color', fore)
+  $(parentImg).addClass(overlay)
+}
+
+function getAverageRGB(img, default_color = '#000') {
+
+  if (img.currentStyle) {
+    var img_url = img.currentStyle['background-image']
+  } else if (window.getComputedStyle) {
+    var img_url = document.defaultView.getComputedStyle(img, null).getPropertyValue('background-image');
+  } else {
+    return default_color
+  }
+  img_url = img_url.substr(5, img_url.length - 7)
+
+  img = document.createElement('img')
+  img.src = img_url
+  img.id = 'dominantColourImg'
+  img.style.display = 'none'
+
+  var blockSize = 5,
+    canvas = document.createElement('canvas'),
+    context = canvas.getContext && canvas.getContext('2d'),
+    data, width, height,
+    i = -4,
+    length,
+    rgb = {
+      r: 0,
+      g: 0,
+      b: 0
+    },
+    count = 0;
+
+  if (!context) {
+    return default_color
+  }
+
+  height = canvas.height = img.naturalHeight || img.offsetHeight || img.height
+  width = canvas.width = img.naturalWidth || img.offsetWidth || img.width
+
+  context.drawImage(img, 0, 0)
+
+  try {
+    data = context.getImageData(0, 0, width, height);
+  } catch (e) {
+    return default_color
+  }
+
+  length = data.data.length
+
+  while ((i += blockSize * 4) < length) {
+    ++count
+    rgb.r += data.data[i]
+    rgb.g += data.data[i + 1]
+    rgb.b += data.data[i + 2]
+  }
+
+  rgb.r = ~~(rgb.r / count)
+  rgb.g = ~~(rgb.g / count)
+  rgb.b = ~~(rgb.b / count)
+
+  $(canvas).remove()
+
+  return rgb
+}
+
+
 function initDraggable() {
-  grid_size = grid ? 20 : 1;
+  grid_size = grid ? 20 : 1
 
   $('.section_layout').removeClass('draggable-outline')
 
   $(".draggable").draggable({
     grid: [grid_size, grid_size],
     containment: ".section_canvas"
-  });
+  })
 }
 
 function createRisizes() {
@@ -243,8 +333,6 @@ function initResizable() {
   const minimum_size = 20;
   let original_width = 0;
   let original_height = 0;
-  let original_x = 0;
-  let original_y = 0;
   let original_mouse_x = 0;
   let original_mouse_y = 0;
 
@@ -260,8 +348,6 @@ function initResizable() {
 
       original_width = parseFloat(getComputedStyle(element, null).getPropertyValue('width').replace('px', ''));
       original_height = parseFloat(getComputedStyle(element, null).getPropertyValue('height').replace('px', ''));
-      original_x = element.getBoundingClientRect().left;
-      original_y = element.getBoundingClientRect().top;
       original_mouse_x = e.pageX;
       original_mouse_y = e.pageY;
 
@@ -275,78 +361,79 @@ function initResizable() {
       if (currentResizer.classList.contains('top')) {
         let height = original_height - (e.pageY - original_mouse_y)
 
-        if (currentResizer.classList.contains('spacer-handle')) {
-          height = original_height + (e.pageY - original_mouse_y)
-        } else {
-          if (height < minimum_size) {
-            return false
-          }
+        if (height > minimum_size) {
+          element.style.minHeight = height + 'px'
         }
-
-        element.style.height = height + 'px'
 
       } else if (currentResizer.classList.contains('bottom')) {
         let height = original_height + (e.pageY - original_mouse_y)
 
         if (height > minimum_size) {
-          element.style.height = height + 'px'
+          element.style.minHeight = height + 'px'
         }
       } else if (currentResizer.classList.contains('right')) {
         let width = original_width + (e.pageX - original_mouse_x)
 
         if (width > minimum_size) {
-          element.style.width = width + 'px'
+          element.style.minWidth = width + 'px'
         }
       } else if (currentResizer.classList.contains('left')) {
         let width = original_width - (e.pageX - original_mouse_x)
 
-        if (currentResizer.classList.contains('spacer-handle')) {
-          width = original_width + (e.pageX - original_mouse_x)
-        } else {
-          if (width < minimum_size) {
-            return false
-          }
+        if (width > minimum_size) {
+          element.style.minWidth = width + 'px'
         }
-
-        element.style.width = width + 'px'
 
       } else if (currentResizer.classList.contains('bottom-right')) {
         const width = original_width + (e.pageX - original_mouse_x)
         const height = original_height + (e.pageY - original_mouse_y)
         if (width > minimum_size) {
-          element.style.width = width + 'px'
+          element.style.minWidth = width + 'px'
         }
         if (height > minimum_size) {
-          element.style.height = height + 'px'
+          element.style.minHeight = height + 'px'
         }
       } else if (currentResizer.classList.contains('bottom-left')) {
         const height = original_height + (e.pageY - original_mouse_y)
         const width = original_width - (e.pageX - original_mouse_x)
         if (height > minimum_size) {
-          element.style.height = height + 'px'
+          element.style.minHeight = height + 'px'
         }
         if (width > minimum_size) {
-          element.style.width = width + 'px'
+          element.style.minWidth = width + 'px'
         }
       } else if (currentResizer.classList.contains('top-right')) {
         const width = original_width + (e.pageX - original_mouse_x)
         const height = original_height - (e.pageY - original_mouse_y)
         if (width > minimum_size) {
-          element.style.width = width + 'px'
+          element.style.minWidth = width + 'px'
         }
         if (height > minimum_size) {
-          element.style.height = height + 'px'
+          element.style.minHeight = height + 'px'
         }
       } else if (currentResizer.classList.contains('top-left')) {
         const width = original_width - (e.pageX - original_mouse_x)
         const height = original_height - (e.pageY - original_mouse_y)
         if (width > minimum_size) {
-          element.style.width = width + 'px'
+          element.style.minWidth = width + 'px'
         }
         if (height > minimum_size) {
-          element.style.height = height + 'px'
+          element.style.minHeight = height + 'px'
         }
       }
+
+      const sectionCanvasWidth = $('.section_canvas').outerWidth()
+      let totalW = 0
+      $('.section_column').each(function () {
+        totalW += $(this).outerWidth()
+      })
+
+      if (totalW > sectionCanvasWidth) {
+        let WMOD = totalW % sectionCanvasWidth
+        element.style.minWidth = (original_width - WMOD) + 'px'
+        return false
+      }
+
     }
 
     function stopResize() {
@@ -363,8 +450,6 @@ function initSpacers() {
   const minimum_size = 0;
   let original_width = 0;
   let original_height = 0;
-  let original_x = 0;
-  let original_y = 0;
   let original_mouse_x = 0;
   let original_mouse_y = 0;
 
@@ -380,8 +465,6 @@ function initSpacers() {
 
       original_width = parseFloat(getComputedStyle(element, null).getPropertyValue('width').replace('px', ''));
       original_height = parseFloat(getComputedStyle(element, null).getPropertyValue('height').replace('px', ''));
-      original_x = element.getBoundingClientRect().left;
-      original_y = element.getBoundingClientRect().top;
       original_mouse_x = e.pageX;
       original_mouse_y = e.pageY;
 
@@ -390,17 +473,31 @@ function initSpacers() {
 
     })
 
-    function onSpaceResize(e){
+    function onSpaceResize(e) {
       $(currentSpacer).parent().addClass('show')
       resize(e)
     }
-    
-    function onSpaceResizeStop(e){
+
+    function onSpaceResizeStop(e) {
       $(currentSpacer).parent().removeClass('show')
       stopResize()
     }
 
     function resize(e) {
+      const sectionCanvasWidth = $('.section_canvas').outerWidth()
+      let totalW = 0
+      $('.section_column').each(function () {
+        totalW += $(this).outerWidth()
+      })
+
+      if (totalW > sectionCanvasWidth) {
+        let WMOD = totalW % sectionCanvasWidth
+        element.style.minWidth = (original_width - WMOD) + 'px'
+        e.stopPropagation()
+        e.preventDefault()
+        return false
+      }
+
       if (currentSpacer.classList.contains('top')) {
         let height = original_height - (e.pageY - original_mouse_y)
 
@@ -440,7 +537,7 @@ function initSpacers() {
         if ($(currentSpacer).parent().parent().find('.spacer-invert').length > 0) {
           width -= 2
           width = original_width + (e.pageX - original_mouse_x)
-        } 
+        }
 
         if (width > minimum_size) {
           element.style.width = width + 'px'
@@ -448,6 +545,7 @@ function initSpacers() {
       }
 
       $(currentSpacer).css('opacity', '1')
+
 
     }
 
@@ -481,15 +579,15 @@ function applyLayout(layoutNum) {
 
   if (num == 1) {
 
-    const $sectionLayout = $('.section_layout')
+    const $sectionLayout = $('.section_column')
     const $sectionImg = $('.section_item_img')
     const $sectionHeading = $sectionLayout.find('.heading').closest('section_item')
     const $sectionText = $sectionLayout.find('.text').closest('section_item')
     const $sectionButton = $sectionLayout.find('.button').closest('section_item')
 
-    $sectionHeading.detach().appendTo($sectionLayout)
-    $sectionText.detach().appendTo($sectionLayout)
-    $sectionButton.detach().appendTo($sectionLayout)
+    $sectionButton.detach().prependTo($sectionLayout)
+    $sectionText.detach().prependTo($sectionLayout)
+    $sectionHeading.detach().prependTo($sectionLayout)
     $sectionImg.detach().prependTo($sectionLayout)
 
     let sectionNewW = $sectionLayout.width() + 80
@@ -514,6 +612,6 @@ function applyLayout(layoutNum) {
   restartDraggableOrSortable()
 }
 
-function UITouchUp(){
+function UITouchUp() {
   $('.section_item_img + .spacer.top').height(2)
 }
