@@ -136,7 +136,6 @@ img {
 } */
 
 .section_layout {
-  /* height: fit-content; */
   outline-offset: 0;
   width: calc(auto + 200px);
   align-self: stretch;
@@ -146,8 +145,8 @@ img {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: fit-content;
-  height: fit-content;
+  /* width: fit-content;
+  height: fit-content; */
   padding: 10px;
   outline-offset: -2px;
 }

@@ -357,70 +357,99 @@ function initResizable() {
     })
 
     function resize(e) {
+      let sc = currentResizer.closest('.section_column')
+
+
+      let columnPaddingL = $(sc).find('.spacer.left').width()
+      let columnPaddingR = $(sc).find('.spacer.right').width()
+
+      if(currentResizer.closest('section_item').hasClass('section_item_img')){
+
+      }
+
+
+      let mouseDiffX = e.pageX - original_mouse_x
+      let mouseDiffY = e.pageY - original_mouse_y
+
+      let boundBox = sc.getBoundingClientRect()
+      let leftColLimit = boundBox.left + boundBox.width - columnPaddingR
+      let rightColLimit = boundBox.left +  columnPaddingL
+
+ 
 
       if (currentResizer.classList.contains('top')) {
-        let height = original_height - (e.pageY - original_mouse_y)
+        let height = original_height - (mouseDiffY)
 
-        if (height > minimum_size) {
+        if (height > minimum_size ) {
           element.style.minHeight = height + 'px'
         }
 
       } else if (currentResizer.classList.contains('bottom')) {
-        let height = original_height + (e.pageY - original_mouse_y)
+        let height = original_height + (mouseDiffY)
 
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
         }
       } else if (currentResizer.classList.contains('right')) {
-        let width = original_width + (e.pageX - original_mouse_x)
+        let width = original_width + (mouseDiffX)
 
-        if (width > minimum_size) {
+        if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
+          element.querySelector('div').style.width = element.style.minWidth
         }
       } else if (currentResizer.classList.contains('left')) {
-        let width = original_width - (e.pageX - original_mouse_x)
+        let width = original_width - (mouseDiffX)
 
-        if (width > minimum_size) {
+        if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
+          element.querySelector('div').style.width = element.style.minWidth
         }
 
       } else if (currentResizer.classList.contains('bottom-right')) {
-        const width = original_width + (e.pageX - original_mouse_x)
-        const height = original_height + (e.pageY - original_mouse_y)
-        if (width > minimum_size) {
+        const width = original_width + (mouseDiffX)
+        const height = original_height + (mouseDiffY)
+        if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
+          element.querySelector('div').style.width = element.style.minWidth
         }
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
         }
       } else if (currentResizer.classList.contains('bottom-left')) {
-        const height = original_height + (e.pageY - original_mouse_y)
-        const width = original_width - (e.pageX - original_mouse_x)
+        const height = original_height + (mouseDiffY)
+        const width = original_width - (mouseDiffX)
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
         }
-        if (width > minimum_size) {
+        if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
+          element.querySelector('div').style.width = element.style.minWidth
         }
       } else if (currentResizer.classList.contains('top-right')) {
-        const width = original_width + (e.pageX - original_mouse_x)
-        const height = original_height - (e.pageY - original_mouse_y)
-        if (width > minimum_size) {
+        const width = original_width + (mouseDiffX)
+        const height = original_height - (mouseDiffY)
+        if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
+          element.querySelector('div').style.width = element.style.minWidth
         }
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
         }
       } else if (currentResizer.classList.contains('top-left')) {
-        const width = original_width - (e.pageX - original_mouse_x)
-        const height = original_height - (e.pageY - original_mouse_y)
-        if (width > minimum_size) {
+        const width = original_width - (mouseDiffX)
+        const height = original_height - (mouseDiffY)
+        if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
           element.style.minWidth = width + 'px'
+          element.querySelector('div').style.width = element.style.minWidth
         }
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
         }
+
       }
+      
+      $(currentResizer).closest('.section_item').addClass('show-outlines')
+      $(currentResizer).closest('.resizers').show()
 
       const sectionCanvasWidth = $('.section_canvas').outerWidth()
       let totalW = 0
@@ -438,6 +467,8 @@ function initResizable() {
 
     function stopResize() {
       restartDraggableOrSortable()
+      $(currentResizer).closest('.section_item').removeClass('show-outlines')
+      $(currentResizer).closest('.resizers').attr('style','')
       window.removeEventListener('mousemove', resize)
     }
   }
@@ -490,6 +521,9 @@ function initSpacers() {
         totalW += $(this).outerWidth()
       })
 
+      let mouseDiffX = e.pageX - original_mouse_x
+      let mouseDiffY = e.pageY - original_mouse_y
+
       if (totalW > sectionCanvasWidth) {
         let WMOD = totalW % sectionCanvasWidth
         element.style.minWidth = (original_width - WMOD) + 'px'
@@ -499,10 +533,10 @@ function initSpacers() {
       }
 
       if (currentSpacer.classList.contains('top')) {
-        let height = original_height - (e.pageY - original_mouse_y)
+        let height = original_height - (mouseDiffY)
 
         if ($(currentSpacer).parent().parent().find('.spacer-invert').length > 0) {
-          height = original_height + (e.pageY - original_mouse_y)
+          height = original_height + (mouseDiffY)
         }
 
         if (height > minimum_size) {
@@ -511,10 +545,10 @@ function initSpacers() {
         }
 
       } else if (currentSpacer.classList.contains('bottom')) {
-        let height = original_height + (e.pageY - original_mouse_y)
+        let height = original_height + (mouseDiffY)
 
         if ($(currentSpacer).parent().parent().find('.spacer-invert').length > 0) {
-          height = original_height - (e.pageY - original_mouse_y)
+          height = original_height - (mouseDiffY)
         }
         if (height > minimum_size) {
           element.style.height = height + 'px'
@@ -522,21 +556,21 @@ function initSpacers() {
 
 
       } else if (currentSpacer.classList.contains('right')) {
-        let width = original_width + (e.pageX - original_mouse_x)
+        let width = original_width + (mouseDiffX)
 
         if ($(currentSpacer).parent().parent().find('.spacer-invert').length > 0) {
-          width = original_width - (e.pageX - original_mouse_x)
+          width = original_width - (mouseDiffX)
         }
 
         if (width > minimum_size) {
           element.style.width = width + 'px'
         }
       } else if (currentSpacer.classList.contains('left')) {
-        let width = original_width - (e.pageX - original_mouse_x)
+        let width = original_width - (mouseDiffX)
 
         if ($(currentSpacer).parent().parent().find('.spacer-invert').length > 0) {
           width -= 2
-          width = original_width + (e.pageX - original_mouse_x)
+          width = original_width + (mouseDiffX)
         }
 
         if (width > minimum_size) {
@@ -579,32 +613,32 @@ function applyLayout(layoutNum) {
 
   if (num == 1) {
 
-    const $sectionLayout = $('.section_column')
+    const $sectionLayout = $('.section_column .section_layout_flex_wrapper')
     const $sectionImg = $('.section_item_img')
-    const $sectionHeading = $sectionLayout.find('.heading').closest('section_item')
-    const $sectionText = $sectionLayout.find('.text').closest('section_item')
-    const $sectionButton = $sectionLayout.find('.button').closest('section_item')
+    const $sectionHeading = $sectionLayout.find('.heading').closest('.section_item')
+    const $sectionText = $sectionLayout.find('.text').closest('.section_item')
+    const $sectionButton = $sectionLayout.find('.button').closest('.section_item')
 
     $sectionButton.detach().prependTo($sectionLayout)
     $sectionText.detach().prependTo($sectionLayout)
     $sectionHeading.detach().prependTo($sectionLayout)
     $sectionImg.detach().prependTo($sectionLayout)
 
-    let sectionNewW = $sectionLayout.width() + 80
-    let sectionNewH = $sectionLayout.height() + 40
-
     $sectionLayout
-      .width(sectionNewW)
-      .height(sectionNewH)
       .css("padding", "0 0 40px 0")
       .addClass('justify-between')
       .removeClass('justify-center')
+
+      $('.section_column').find('.spacer.top').height(1)
+      $('.section_column').find('.spacer.left, .spacer.right').width(1)
 
     $sectionImg.css({
       width: 'calc(100% - 20px)',
       backgroundPosition: "bottom",
       marginBottom: "20px"
     })
+
+    $sectionText.find('.text').width(600)
   }
 
   $('.align-bar-button[data-align="center"]').click()
