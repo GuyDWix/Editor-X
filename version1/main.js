@@ -4,10 +4,10 @@ var contrastTolarance = 120
 var currentSize = "1280"
 var isReloaded = false
 var sizeDom = {
-  1280:``,
-  960:``,
-  720:``,
-  480:``
+  1280: ``,
+  960: ``,
+  720: ``,
+  480: ``
 }
 
 $(function () {
@@ -72,18 +72,37 @@ function initOutlayoutStyling() {
 }
 
 function updateCanvas() {
-  let size = currentSize = $(this).attr('data-size')
+  currentSize = $(this).attr('data-size')
+  $('.section_canvas').children().fadeOut(200)
 
-  if(sizeDom[currentSize].length > 0 && sizeDom[currentSize] !== ""){
-    reloadSavedDom()
-  }else{
-    reAdjustContent(size)
+  if (sizeDom[currentSize].length > 0 && sizeDom[currentSize] !== "") {
+    setTimeout(() => {
+      reloadSavedDom()
+      initSpacers()
+      initSortable()
+      initResizable()
+    }, 200);
+  } else {
+    reAdjustContent(currentSize)
+    $('.section_canvas').children().fadeIn(200)
     saveDomString()
   }
 
+  if (parseInt(currentSize) < 960) {
+    $('.section_canvas')
+      .removeClass('flex-row')
+      .addClass('flex-column')
+  } else {
+    $('.section_canvas')
+      .addClass('flex-row')
+      .removeClass('flex-column')
+  }
+
   $('.section_canvas').animate({
-    width: size
+    width: currentSize
   }, 500)
+
+  isReloaded = true
 
 }
 
@@ -95,10 +114,6 @@ function reAdjustContent(size) {
   let colNum = $('.section_column').length
 
   if (size < 960) {
-    $('.section_canvas')
-      .removeClass('flex-row')
-      .addClass('flex-column')
-
 
     $('.section_item').each(function () {
       $(this)[0].style.minWidth = (size - colPaddingSum - 20) + 'px'
@@ -110,24 +125,16 @@ function reAdjustContent(size) {
     })
 
   } else {
-    $('.section_canvas')
-      .addClass('flex-row')
-      .removeClass('flex-column')
-
-      $('.section_item_img')[0].style.minWidth = (size/colNum - colPaddingSum - 20) + 'px'
+    $('.section_item_img')[0].style.minWidth = (size / colNum - colPaddingSum - 20) + 'px'
   }
 }
 
-function saveDomString(){
-  sizeDom[currentSize] = document.body.innerHTML
+function saveDomString() {
+  sizeDom[currentSize] = document.querySelector('.section_canvas').innerHTML
 }
 
-function reloadSavedDom(){
-  document.body.innerHTML = sizeDom[currentSize]
-  setTimeout(() => {
-    isReloaded = true
-    init()
-  }, 200);
+function reloadSavedDom() {
+  document.querySelector('.section_canvas').innerHTML = sizeDom[currentSize]
 }
 
 function alignBtns() {
@@ -399,7 +406,7 @@ function createSpacers() {
 }
 
 function initResizable() {
-  if(!isReloaded){
+  if (!isReloaded) {
     createRisizes()
   }
   const resizers = document.querySelectorAll('.resizer')
@@ -549,7 +556,7 @@ function initResizable() {
 }
 
 function initSpacers() {
-  if(!isReloaded){
+  if (!isReloaded) {
     createSpacers()
   }
   const spacers = document.querySelectorAll('.spacer-handle')
@@ -665,7 +672,7 @@ function initSpacers() {
     function stopResize() {
       restartDraggableOrSortable()
       window.removeEventListener('mousemove', onSpaceResize)
-      saveDomeString()
+      saveDomString()
     }
   }
 
@@ -729,6 +736,6 @@ function applyLayout(layoutNum) {
 function UITouchUp() {
   $('.section_item_img + .spacer.top').height(2)
   $('.section_column').last().children('.spacer.top').first().height(95)
-  $('[data-size='+currentSize+']').siblings('input').attr('checked','true')
+  $('[data-size=' + currentSize + ']').siblings('input').attr('checked', 'true')
   saveDomString()
 }
