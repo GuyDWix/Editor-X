@@ -469,23 +469,32 @@ function initResizable() {
         let width = original_width + (mouseDiffX)
 
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
+          let elChild = element.children[0]
           element.style.minWidth = width + 'px'
-          element.children[0].style.width = element.style.minWidth
+          
+          if(!$(element).hasClass('section_item_img'))
+          elChild.style.width = element.style.minWidth
         }
       } else if (currentResizer.classList.contains('left')) {
         let width = original_width - (mouseDiffX)
 
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
+          let elChild = element.children[0]
           element.style.minWidth = width + 'px'
-          element.children[0].style.width = element.style.minWidth
+          
+          if(!$(element).hasClass('section_item_img'))
+          elChild.style.width = element.style.minWidth
         }
 
       } else if (currentResizer.classList.contains('bottom-right')) {
         const width = original_width + (mouseDiffX)
         const height = original_height + (mouseDiffY)
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
+          let elChild = element.children[0]
           element.style.minWidth = width + 'px'
-          element.children[0].style.width = element.style.minWidth
+          
+          if(!$(element).hasClass('section_item_img'))
+          elChild.style.width = element.style.minWidth
         }
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
@@ -497,15 +506,21 @@ function initResizable() {
           element.style.minHeight = height + 'px'
         }
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
+          let elChild = element.children[0]
           element.style.minWidth = width + 'px'
-          element.children[0].style.width = element.style.minWidth
+          
+          if(!$(element).hasClass('section_item_img'))
+          elChild.style.width = element.style.minWidth
         }
       } else if (currentResizer.classList.contains('top-right')) {
         const width = original_width + (mouseDiffX)
         const height = original_height - (mouseDiffY)
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
+          let elChild = element.children[0]
           element.style.minWidth = width + 'px'
-          element.children[0].style.width = element.style.minWidth
+          
+          if(!$(element).hasClass('section_item_img'))
+          elChild.style.width = element.style.minWidth
         }
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
@@ -514,8 +529,11 @@ function initResizable() {
         const width = original_width - (mouseDiffX)
         const height = original_height - (mouseDiffY)
         if (width > minimum_size && e.pageX < leftColLimit && e.pageX > rightColLimit) {
+          let elChild = element.children[0]
           element.style.minWidth = width + 'px'
-          element.children[0].style.width = element.style.minWidth
+          
+          if(!$(element).hasClass('section_item_img'))
+          elChild.style.width = element.style.minWidth
         }
         if (height > minimum_size) {
           element.style.minHeight = height + 'px'
